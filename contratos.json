@@ -1,0 +1,42 @@
+{
+  "T1786223059556_3223214634": {
+    "contractId": "T1786223059556_3223214634",
+    "signee": {
+      "id": "1418970163658620950",
+      "username": "headfiree_25282"
+    },
+    "contractor": {
+      "id": "1401975801435656252",
+      "username": "souza14ke"
+    },
+    "teamName": "Internacional",
+    "teamRoleId": "1534378014018764852",
+    "position": "cb",
+    "role": "titular",
+    "proposedAt": "2026-08-08T21:04:19.556Z",
+    "signedAt": "2026-08-08T21:05:19.264Z",
+    "expiresAt": "2026-08-09T21:05:19.264Z",
+    "channelId": "1534009385226076370",
+    "guildId": "1534008399648522440"
+  },
+  "T1786237762362_7837519356": {
+    "contractId": "T1786237762362_7837519356",
+    "signee": {
+      "id": "1465839519981899796",
+      "username": "starknoskills"
+    },
+    "contractor": {
+      "id": "590343200858701889",
+      "username": "lothusf."
+    },
+    "teamName": "Corinthians",
+    "teamRoleId": "1534376566006616155",
+    "position": "Pe",
+    "role": "Titular",
+    "proposedAt": "2026-08-09T01:09:22.362Z",
+    "signedAt": "2026-08-09T01:09:28.816Z",
+    "expiresAt": "2026-08-10T01:09:28.816Z",
+    "channelId": "1534009385226076370",
+    "guildId": "1534008399648522440"
+  }
+}
