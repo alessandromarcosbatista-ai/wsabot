@@ -349,6 +349,14 @@ function isRoleAllowed(role) {
     return false;
 }
 
+function getRoleRosterSize(guild, role) {
+    if (!role || !guild) return 0;
+    if (role.members?.cache?.size != null) {
+        return role.members.cache.size;
+    }
+    return guild.members.cache.filter(member => member.roles.cache.has(role.id)).size;
+}
+
 async function sendToChannel(guild, channelId, payload, threadName) {
     const channel = guild.channels.cache.get(channelId) || await guild.channels.fetch(channelId).catch(() => null);
     if (!channel) return;
@@ -586,7 +594,7 @@ client.on('interactionCreate', async (interaction) => {
             const isTeamContract = true; // Sempre true agora pois é garantido
 
             // Use cached role members instead of a bulk fetch to avoid gateway rate limits.
-            const rosterSize = teamRole.members.cache.size;
+            const rosterSize = getRoleRosterSize(interaction.guild, teamRole);
 
             if (rosterSize >= MAX_ROSTER_SIZE) {
                 return interaction.editReply({
