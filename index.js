@@ -315,6 +315,7 @@ function formatDate(date) {
 }
 
 function hasCommandPermission(member) {
+    if (!member) return false;
     return ALLOWED_COMMAND_ROLES.some(roleId => member.roles.cache.has(roleId));
 }
 
@@ -324,6 +325,14 @@ function hasAdminPermission(member) {
     if (member.permissions?.has(PermissionFlagsBits.Administrator)) return true;
 
     return ADMIN_ROLE_IDS.some(roleId => member.roles.cache.has(roleId));
+}
+
+function ensureGuildInteraction(interaction) {
+    if (!interaction.guild || !interaction.member) {
+        interaction.reply({ content: '❌ Este comando só pode ser usado dentro de um servidor.', ephemeral: true }).catch(() => null);
+        return false;
+    }
+    return true;
 }
 
 function isContractChannelAllowed(channelId) {
@@ -506,11 +515,12 @@ client.on('interactionCreate', async (interaction) => {
 
         // ─── /help ─────────────────────────────────────
         if (interaction.commandName === 'help') {
-            return interaction.reply({ embeds: [buildHelpEmbed()], flags: MessageFlags.Ephemeral });
+            return interaction.reply({ embeds: [buildHelpEmbed()], ephemeral: true });
         }
 
         // ─── /janela ───────────────────────────────────
         if (interaction.commandName === 'janela') {
+            if (!ensureGuildInteraction(interaction)) return;
             if (!hasAdminPermission(interaction.member)) {
                 return interaction.reply({
                     embeds: [
@@ -521,14 +531,14 @@ client.on('interactionCreate', async (interaction) => {
                             .setFooter({ text: 'WSA Bot' })
                             .setTimestamp()
                     ],
-                    flags: MessageFlags.Ephemeral
+                    ephemeral: true
                 });
             }
 
             return interaction.reply({
                 embeds: [buildTransferWindowEmbed()],
                 components: [buildTransferWindowSelectMenu()],
-                flags: MessageFlags.Ephemeral
+                ephemeral: true
             });
         }
 
@@ -537,7 +547,8 @@ client.on('interactionCreate', async (interaction) => {
         // ═══════════════════════════════════════════════════
 
         if (interaction.commandName === 'contract') {
-            await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+            if (!ensureGuildInteraction(interaction)) return;
+            await interaction.deferReply({ ephemeral: true });
 
             if (!isContractChannelAllowed(interaction.channelId)) {
                 return interaction.editReply({
@@ -698,7 +709,8 @@ client.on('interactionCreate', async (interaction) => {
         // ═══════════════════════════════════════════════════
 
         else if (interaction.commandName === 'contratos_ativos') {
-            await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+            if (!ensureGuildInteraction(interaction)) return;
+            await interaction.deferReply({ ephemeral: true });
 
             if (!hasCommandPermission(interaction.member)) {
                 return interaction.editReply({
@@ -732,7 +744,8 @@ client.on('interactionCreate', async (interaction) => {
         // ═══════════════════════════════════════════════════
 
         else if (interaction.commandName === 'meu_contrato') {
-            await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+            if (!ensureGuildInteraction(interaction)) return;
+            await interaction.deferReply({ ephemeral: true });
 
             if (!hasCommandPermission(interaction.member)) {
                 return interaction.editReply({
@@ -765,7 +778,8 @@ client.on('interactionCreate', async (interaction) => {
         // ═══════════════════════════════════════════════════
 
         else if (interaction.commandName === 'fa') {
-            await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+            if (!ensureGuildInteraction(interaction)) return;
+            await interaction.deferReply({ ephemeral: true });
 
             // Verificar janela de FA
             if (!transferWindow.freeAgent) {
@@ -833,7 +847,8 @@ client.on('interactionCreate', async (interaction) => {
         // ═══════════════════════════════════════════════════
 
         else if (interaction.commandName === 'release') {
-            await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+            if (!ensureGuildInteraction(interaction)) return;
+            await interaction.deferReply({ ephemeral: true });
 
             if (!ALLOWED_RELEASE_CHANNELS.includes(interaction.channelId)) {
                 return interaction.editReply({
@@ -927,11 +942,11 @@ client.on('interactionCreate', async (interaction) => {
 
         const contractData = pendingContracts.get(contractId);
         if (!contractData) {
-            return interaction.reply({ content: '❌ Contrato não encontrado ou já processado.', flags: MessageFlags.Ephemeral });
+            return interaction.reply({ content: '❌ Contrato não encontrado ou já processado.', ephemeral: true });
         }
 
         if (interaction.user.id !== contractData.signee.id) {
-            return interaction.reply({ content: '❌ Apenas o jogador indicado pode aceitar ou rejeitar este contrato.', flags: MessageFlags.Ephemeral });
+            return interaction.reply({ content: '❌ Apenas o jogador indicado pode aceitar ou rejeitar este contrato.', ephemeral: true });
         }
 
         if (action === 'accept') {
@@ -1037,7 +1052,7 @@ client.on('interactionCreate', async (interaction) => {
                         .setFooter({ text: `WSA Bot • Alterado por ${interaction.user.username}` })
                         .setTimestamp()
                 ],
-                flags: MessageFlags.Ephemeral
+                ephemeral: true
             });
 
             return;
@@ -1048,9 +1063,9 @@ client.on('interactionCreate', async (interaction) => {
 } catch (err) {
     console.error('Erro no interactionCreate:', err);
     if (interaction?.deferred || interaction?.replied) {
-        await interaction.followUp({ content: '❌ Ocorreu um erro interno. Tente novamente mais tarde.', flags: MessageFlags.Ephemeral }).catch(() => null);
+        await interaction.followUp({ content: '❌ Ocorreu um erro interno. Tente novamente mais tarde.', ephemeral: true }).catch(() => null);
     } else {
-        await interaction.reply({ content: '❌ Ocorreu um erro interno. Tente novamente mais tarde.', flags: MessageFlags.Ephemeral }).catch(() => null);
+        await interaction.reply({ content: '❌ Ocorreu um erro interno. Tente novamente mais tarde.', ephemeral: true }).catch(() => null);
     }
 }
 });
