@@ -499,9 +499,10 @@ client.once('ready', async () => {
 // ═══════════════════════════════════════════════════
 
 client.on('interactionCreate', async (interaction) => {
+    try {
 
-    // ─── SLASH COMMANDS ──────────────────────────────────
-    if (interaction.isChatInputCommand()) {
+        // ─── SLASH COMMANDS ──────────────────────────────────
+        if (interaction.isChatInputCommand()) {
 
         // ─── /help ─────────────────────────────────────
         if (interaction.commandName === 'help') {
@@ -948,9 +949,9 @@ client.on('interactionCreate', async (interaction) => {
             // Adicionar cargo do time e remover FA
             try {
                 const guild = interaction.guild;
-                let member = guild.members.cache.get(contractData.signee.id);
+                let member = interaction.member || guild.members.cache.get(contractData.signee.id);
                 if (!member) {
-                    member = await guild.members.fetch(contractData.signee.id).catch(() => null);
+                    member = guild.members.cache.get(contractData.signee.id);
                 }
                 if (member && contractData.teamRoleId) {
                     await member.roles.add(contractData.teamRoleId);
@@ -1044,6 +1045,14 @@ client.on('interactionCreate', async (interaction) => {
 
 
     }
+} catch (err) {
+    console.error('Erro no interactionCreate:', err);
+    if (interaction?.deferred || interaction?.replied) {
+        await interaction.followUp({ content: '❌ Ocorreu um erro interno. Tente novamente mais tarde.', flags: MessageFlags.Ephemeral }).catch(() => null);
+    } else {
+        await interaction.reply({ content: '❌ Ocorreu um erro interno. Tente novamente mais tarde.', flags: MessageFlags.Ephemeral }).catch(() => null);
+    }
+}
 });
 
 client.login(process.env.DISCORD_TOKEN);
